@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { CheckCircle, WarningCircle } from '@phosphor-icons/react'
+import { CheckCircle, WarningCircle, UploadSimple } from '@phosphor-icons/react'
 import { Toaster, toast } from 'sonner'
 import { FileUpload } from './components/FileUpload'
-import { PlayerSearch } from './components/PlayerSearch'
 import { TradeSide } from './components/TradeSide'
 import { TradeSummary } from './components/TradeSummary'
 import { Alert, AlertDescription } from './components/ui/alert'
+import { Button } from './components/ui/button'
 import { parseExcelFile } from './lib/excel-parser'
 import type { Player, TradeState } from './lib/types'
 
@@ -58,6 +58,12 @@ function App() {
   const handleClearTrade = () => {
     setTradeState({ teamA: [], teamB: [] })
     toast.info('Trade cleared')
+  }
+
+  const handleReloadData = () => {
+    setPlayers([])
+    setTradeState({ teamA: [], teamB: [] })
+    toast.info('Data cleared - upload new spreadsheet')
   }
 
   const selectedPlayerIds = useMemo(() => {
@@ -116,48 +122,52 @@ function App() {
           </div>
         ) : (
           <>
-            <Alert className="bg-success/10 border-success text-success-foreground">
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>{players.length} players loaded.</strong> Use the search below to build your trade.
-              </AlertDescription>
-            </Alert>
+            <div className="flex items-center justify-between gap-4">
+              <Alert className="bg-success/10 border-success text-success-foreground flex-1">
+                <CheckCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>{players.length} players loaded.</strong> Add players to each team using the buttons below.
+                </AlertDescription>
+              </Alert>
+              <Button 
+                variant="outline" 
+                onClick={handleReloadData}
+                className="whitespace-nowrap"
+              >
+                <UploadSimple className="mr-2" size={16} />
+                Upload New File
+              </Button>
+            </div>
 
-            <div className="grid lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1">
-                <PlayerSearch
-                  players={players}
-                  onAddPlayer={handleAddPlayer}
-                  selectedPlayerIds={selectedPlayerIds}
-                />
-              </div>
+            {hasActiveTrade && (
+              <TradeSummary
+                teamAValue={teamAValue}
+                teamBValue={teamBValue}
+                onClearTrade={handleClearTrade}
+              />
+            )}
 
-              <div className="lg:col-span-2 space-y-6">
-                {hasActiveTrade && (
-                  <TradeSummary
-                    teamAValue={teamAValue}
-                    teamBValue={teamBValue}
-                    onClearTrade={handleClearTrade}
-                  />
-                )}
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <TradeSide
-                    title="Team A"
-                    players={tradeState.teamA}
-                    totalValue={teamAValue}
-                    onRemovePlayer={(id) => handleRemovePlayer(id, 'teamA')}
-                    highlight={getHighlight(true)}
-                  />
-                  <TradeSide
-                    title="Team B"
-                    players={tradeState.teamB}
-                    totalValue={teamBValue}
-                    onRemovePlayer={(id) => handleRemovePlayer(id, 'teamB')}
-                    highlight={getHighlight(false)}
-                  />
-                </div>
-              </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              <TradeSide
+                title="Team A"
+                players={tradeState.teamA}
+                totalValue={teamAValue}
+                onRemovePlayer={(id) => handleRemovePlayer(id, 'teamA')}
+                onAddPlayer={(player) => handleAddPlayer(player, 'teamA')}
+                allPlayers={players}
+                selectedPlayerIds={selectedPlayerIds}
+                highlight={getHighlight(true)}
+              />
+              <TradeSide
+                title="Team B"
+                players={tradeState.teamB}
+                totalValue={teamBValue}
+                onRemovePlayer={(id) => handleRemovePlayer(id, 'teamB')}
+                onAddPlayer={(player) => handleAddPlayer(player, 'teamB')}
+                allPlayers={players}
+                selectedPlayerIds={selectedPlayerIds}
+                highlight={getHighlight(false)}
+              />
             </div>
           </>
         )}
