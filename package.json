@@ -5,7 +5,7 @@
     "homepage": "https://jgleonard.github.io/dynasty-trade-calculator",
     "type": "module",
     "scripts": {
-        "predeploy": "npm run build",
+        "predeploy": "npm run build && touch dist/.nojekyll",
         "deploy": "gh-pages -d dist",
         "dev": "vite",
         "kill": "fuser -k 5000/tcp",

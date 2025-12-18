@@ -1,4 +1,5 @@
 import fs from "fs";
+import plugin from "tailwindcss/plugin";
 
 /** @type {import('tailwindcss').Config} */
 
@@ -13,16 +14,7 @@ try {
   console.error('failed to parse custom styles', err)
 }
 const defaultTheme = {
-  container: {
-    center: true,
-    padding: "2rem",
-  },
   extend: {
-    screens: {
-      coarse: { raw: "(pointer: coarse)" },
-      fine: { raw: "(pointer: fine)" },
-      pwa: { raw: "(display-mode: standalone)" },
-    },
     colors: {
       neutral: {
         1: "var(--color-neutral-1)",
@@ -144,4 +136,18 @@ const defaultTheme = {
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: { ...defaultTheme, ...theme },
+  corePlugins: {
+    container: false,
+  },
+  plugins: [
+    plugin(function({ addComponents }) {
+      addComponents({
+        '.container': {
+          width: '100%',
+          marginInline: 'auto',
+          paddingInline: '2rem',
+        }
+      })
+    })
+  ],
 };

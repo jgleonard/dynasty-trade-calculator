@@ -10,6 +10,7 @@ const projectRoot = process.env.PROJECT_ROOT || import.meta.dirname
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/dynasty-trade-calculator/',
   plugins: [
     react(),
     tailwindcss(),
@@ -22,4 +23,7 @@ export default defineConfig({
       '@': resolve(projectRoot, 'src')
     }
   },
+  server: {
+    cors: false
+  }
 });
